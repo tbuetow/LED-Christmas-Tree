@@ -58,16 +58,7 @@
           "width": 0.0
         }
       ],
-      "drc_exclusions": [
-        [
-          "courtyards_overlap|135445000|74216457|92e2f674-e9cb-426b-864f-b96f65b5fc7c|fb33a7d5-b6c3-4219-87f9-249b66699a0c",
-          ""
-        ],
-        [
-          "courtyards_overlap|144482131|74379172|92e2f674-e9cb-426b-864f-b96f65b5fc7c|af4ea5d0-54e4-480a-a78f-9d25716239bf",
-          ""
-        ]
-      ],
+      "drc_exclusions": [],
       "meta": {
         "version": 2
       },
@@ -115,7 +106,7 @@
         "skew_out_of_range": "error",
         "solder_mask_bridge": "error",
         "starved_thermal": "error",
-        "text_height": "warning",
+        "text_height": "ignore",
         "text_on_edge_cuts": "error",
         "text_thickness": "warning",
         "through_hole_pad_without_hole": "error",
@@ -512,7 +503,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "",
+      "plot": "manufacturing/",
       "pos_files": "",
       "specctra_dsn": "",
       "step": "LED_PCB.step",

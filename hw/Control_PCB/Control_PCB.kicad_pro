@@ -58,7 +58,20 @@
           "width": 0.0
         }
       ],
-      "drc_exclusions": [],
+      "drc_exclusions": [
+        [
+          "copper_edge_clearance|145605373|59410742|6ca7989f-94bb-417c-bf64-9a22ef7f21fc|0f0855f9-6fdf-4c6a-a56f-aa968ed1ae46",
+          "usb ok"
+        ],
+        [
+          "copper_edge_clearance|154394626|59410742|6ca7989f-94bb-417c-bf64-9a22ef7f21fc|4410b18a-aa28-4aa1-81c6-e474a5b08291",
+          "usb ok"
+        ],
+        [
+          "courtyards_overlap|145695000|65235000|322d4a74-83cf-4868-bd8d-42136c5b2218|ea93278c-6189-4cb4-99b0-9f9196401adf",
+          "OK"
+        ]
+      ],
       "meta": {
         "version": 2
       },
@@ -106,7 +119,7 @@
         "skew_out_of_range": "error",
         "solder_mask_bridge": "error",
         "starved_thermal": "error",
-        "text_height": "warning",
+        "text_height": "ignore",
         "text_on_edge_cuts": "error",
         "text_thickness": "warning",
         "through_hole_pad_without_hole": "error",
@@ -188,6 +201,7 @@
       ],
       "track_widths": [
         0.0,
+        0.18,
         0.2,
         0.3,
         0.4
@@ -587,6 +601,24 @@
           "group_by": false,
           "label": "#",
           "name": "${ITEM_NUMBER}",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Sim.Device",
+          "name": "Sim.Device",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Sim.Pins",
+          "name": "Sim.Pins",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Voltage",
+          "name": "Voltage",
           "show": false
         }
       ],
