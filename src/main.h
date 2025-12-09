@@ -1,0 +1,8 @@
+#include <stdint.h>
+
+#ifndef _MAIN_H_
+#define _MAIN_H_
+
+int main();
+
+#endif  // _MAIN_H_
