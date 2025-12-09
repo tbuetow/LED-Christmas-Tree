@@ -3847,7 +3847,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "Conn_01x04"
+		(property "Value" "PPPC022LFBN-RC"
 			(at -1.27 -5.31 90)
 			(layer "B.Fab")
 			(uuid "24280656-9c73-4671-a86b-b18f8be13e39")

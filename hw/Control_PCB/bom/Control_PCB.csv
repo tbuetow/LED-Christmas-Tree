@@ -1,0 +1,14 @@
+Reference,Qty,Value,DNP,Exclude from BOM,Exclude from Board,Footprint,Datasheet
+C1,1,1u,,,,Capacitor_SMD:C_0603_1608Metric,~
+C2,1,.1u,,,,Capacitor_SMD:C_0603_1608Metric,~
+D1,1,B5819WS-TP,,,,Diode_SMD:D_SOD-323_HandSoldering,https://www.mccsemi.com/pdf/Products/B5817WS-B5819WS(SOD-323).PDF
+J1,1,USB4125-GF-A,,,,Connector_USB:USB_C_Receptacle_GCT_USB4125-xx-x_6P_TopMnt_Horizontal,https://www.usb.org/sites/default/files/documents/usb_type-c.zip
+J2,1,PRPC040DAAN-RC,,,,Connector_PinHeader_2.54mm:PinHeader_2x02_P2.54mm_Vertical,~
+J3,1,Conn_01x03_Pin,DNP,Excluded from BOM,,Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical,~
+"R1,R2",2,5.1k,,,,Resistor_SMD:R_0603_1608Metric,~
+"R3,R4",2,10k,,,,Resistor_SMD:R_0603_1608Metric,~
+R5,1,1k,,,,Resistor_SMD:R_0603_1608Metric,~
+SW1,1,Brightness,,,,Button_Switch_SMD:SW_SPST_EVQP7C,~
+SW2,1,Mode,,,,Button_Switch_SMD:SW_SPST_EVQP7C,~
+TP1,1,Tick,,,,TestPoint:TestPoint_Pad_D1.0mm,~
+U1,1,ATtiny1616-M,,,,Package_DFN_QFN:VQFN-20-1EP_3x3mm_P0.4mm_EP1.7x1.7mm,http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny3216_ATtiny1616-data-sheet-40001997B.pdf

@@ -1,0 +1,4 @@
+"Reference","Qty","Value","DNP","Exclude from BOM","Exclude from Board","Footprint","Datasheet"
+"C1,C2,C3,C4","4",".1u","","","","Capacitor_SMD:C_0603_1608Metric","~"
+"D1,D2,D3,D4,D5,D6,D7,D8,D9,D10","10","APA102","","","","LED_SMD:LED_RGB_5050-6","http://www.led-color.com/upload/201506/APA102%20LED.pdf"
+"J1","1","PPPC022LFBN-RC","","","","Connector_PinSocket_2.54mm:PinSocket_2x02_P2.54mm_Vertical","~"

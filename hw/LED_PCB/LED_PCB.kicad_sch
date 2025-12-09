@@ -2938,7 +2938,7 @@
 				)
 			)
 		)
-		(property "Value" "Conn_01x04"
+		(property "Value" "PPPC022LFBN-RC"
 			(at 21.59 74.93 0)
 			(effects
 				(font
