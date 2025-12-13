@@ -1,0 +1,37 @@
+# 🎄RGB LED Christmas Trees!
+
+Each year, I make a small holiday bauble for teachers, family, and friends. Usually my wife and I come up with an idea around Thanksgiving and then panic for three weeks to deliver something by the last day of school for the holidays.
+
+This year we chose to revisit something we made 7 years ago, but improve on it, building on some of my more recent projects with addressable RGB LEDs and better tools like my multiple extruder 3D printer and solder reflow oven.
+
+The concept is a clear thin 3D printed tree on top of a 3D printed base that powers LEDs inside of it. 7 years ago, this was a pair of AA batteries, a single discrete color changing LED, and a power switch. You could also run it off of a 5V supply via micro-USB. Times have changed now! I had a few simple improvements I wanted to make.
+
+- USB-C with proper support for all USB-C power supplies. I chose to drop batteries just due to cost.
+- A ring of addressable RGB LEDs instead of a single unmodifiable color changing LED.
+- The ability to change the LED color effects, and provide many included options.
+- Multiple color printing to make it more beautiful.
+- Under $10 and very easy to manufacture, since we want to make 30-40 of these.
+- Document the process to share with others and allow those who are inclined to write their one color effects.
+
+## Hardware
+I designed the base and all other fixtures and accessories, except for the trees in Autodesk Fusion.
+
+![Fusion screenshot](images/Fusion-base-slice.png)
+
+The circuit boards were designed in KiCAD. Thanks to the power of modern microprocessors and addressable LEDs, the circuit is very simple!
+![KiCad Electrical Schematic](images/KiCad-control-schematic.png)
+![KiCad Electrical Layout](images/KiCad-control-layout.png)
+
+Due to my improved tools at home, the control board is **very** small, just 37mm (under 1.5") across. These are ordered as bare PCBs and I use solder paste and stencils to set components and then reflow them in my solder oven
+
+<Insert solder oven photo here>
+
+## Software
+
+
+# Building your own effects
+## Prerequisites
+
+## VSCode / PlatformIO
+
+## Writing effects
