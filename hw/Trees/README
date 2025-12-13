@@ -1,0 +1,33 @@
+# Vase Trees
+A Selection of trees that I liked to print in vase mode and put on top of the LED Bases.
+
+The spiral trees are courtesy of [Triple G Workshop](https://www.printables.com/model/655419-ultimate-vase-mode-christmas-tree-collection/files).
+
+The pointy tree is courtesy of [SASSy Design](https://www.printables.com/model/684498-sassy-christmas-tree-vase-mode-geometrical-design).
+
+## Project 3MF files
+The 3MF files here are preconfigured for printing, including the hole to fit over the LED base, as described below.
+
+All trees in the project have some form of license or copyright that I do not control unless stated otherwise. Individual trees have their associated licenses detailed in their respective folders.
+
+Unfortunately, some of these licenses do not allow me to host copies or even derivative works, so they are not included here. Please see the attribution documents and links above to obtain them.
+
+## How to Slice
+### Import model
+Bring the model into your slicer and resize it to be 120mm in diameter (set X and Y to be the same) and 180mm in height. You may need to unlock sizing constraints
+
+
+### Add hole to fit over LED Base
+Add a negative cylinder shape to the tree in your slicer.
+
+Make it 75.1mm in diameter and 1mm tall.
+
+Make sure it is placed on the bed and centered with reference to the tree model
+
+### Slicer settings
+Set the slicer to vase mode
+
+The gcode preview should show an open hole at the bottom, with an inner wall that is 1mm high.
+
+### Optional point fix
+These trees will all end up with very sharp tips. I recommend using your slicer to cut off the top 2mm.
