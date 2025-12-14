@@ -19,8 +19,7 @@ I designed the base and all other fixtures and accessories, except for the trees
 
 ![Fusion screenshot](images/Fusion-base-slice.png)
 
-You can download it from [Autodesk Fusion](https://www.autodesk.com/products/fusion-360/overview) if you want to make modifications yourself. Fusion is free for personal use.
-<iframe src="https://gmail2605510.autodesk360.com/shares/public/SH90d2dQT28d5b602811dd4c983dbeae4169?mode=embed" width="800" height="600" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"  frameborder="0"></iframe>
+You can download it from my [Fusion account](https://a360.co/4iSF2QG) if you want to make modifications yourself. Fusion is free for personal use, get it [here](https://www.autodesk.com/products/fusion-360/overview).
 
 The most likely thing you will want to modify is the embedded text. Just edit the text sketch on the Base component.
 ![Fusion Browser Tree View, highlighting a sketch called text](/images/fusion-base-browser-text.png)
