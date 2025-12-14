@@ -19,14 +19,14 @@ I designed the base and all other fixtures and accessories, except for the trees
 
 Printing was done on my Prusa XL and Core One.
 I started by testing color combinations:
-![Tree base in green with text colors for text](images/IMG_0062.HEIC)
+![Tree base in green with text colors for text](images/IMG_0062.jpg)
 
 Once done, I was able to begin producing them multiples at a time:
-![Tree base printing in progress](images/IMG_0077.HEIC)
+![Tree base printing in progress](images/IMG_0077.jpg)
 
 The light dividers and trees were printed on the Core One. Lots of time starting the next print!
-![Clear tree printing in vase mode](images/IMG_0078.HEIC)
-![Plastic dividers printing](images/IMG_0075.HEIC)
+![Clear tree printing in vase mode](images/IMG_0078.jpg)
+![Plastic dividers printing](images/IMG_0075.jpg)
 
 ## Circuit Boards
 The circuit boards were designed in KiCAD. Thanks to the power of modern microprocessors and addressable LEDs, the circuit is quite simple.
