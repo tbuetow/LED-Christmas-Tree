@@ -13,20 +13,34 @@ The concept is a clear thin 3D printed tree on top of a 3D printed base that pow
 - Under $10 and very easy to manufacture, since we want to make 30-40 of these.
 - Document the process to share with others and allow those who are inclined to write their one color effects.
 
-## Hardware
+## 3D Printed Parts
 I designed the base and all other fixtures and accessories, except for the trees in Autodesk Fusion.
-
 ![Fusion screenshot](images/Fusion-base-slice.png)
 
-The circuit boards were designed in KiCAD. Thanks to the power of modern microprocessors and addressable LEDs, the circuit is very simple!
+Printing was done on my Prusa XL and Core One.
+I started by testing color combinations:
+![Tree base in green with text colors for text](images/IMG_0062.HEIC)
+
+Once done, I was able to begin producing them multiples at a time:
+![Tree base printing in progress](images/IMG_0077.HEIC)
+
+The light dividers and trees were printed on the Core One. Lots of time starting the next print!
+![Clear tree printing in vase mode](images/IMG_0078.HEIC)
+![Plastic dividers printing](images/IMG_0075.HEIC)
+
+## Circuit Boards
+The circuit boards were designed in KiCAD. Thanks to the power of modern microprocessors and addressable LEDs, the circuit is quite simple.
 ![KiCad Electrical Schematic](images/KiCad-control-schematic.png)
 ![KiCad Electrical Layout](images/KiCad-control-layout.png)
 
-Due to my improved tools at home, the control board is **very** small, just 37mm (under 1.5") across. These are ordered as bare PCBs and I use solder paste and stencils to set components and then reflow them in my solder oven
+The control board is **very** small, just 37mm (under 1.5") across. This is in part because I can get the new(er) Microchip ATTiny1616 in a QFN packaged. These are ordered as bare PCBs and I use solder paste and stencils to set components and then reflow them in my solder oven. I would not recommend hand soldering these unless you are very skilled. It would be better to switch to slightly larger components and change the microprocessor out for one in a SOIC package or similar.
 
 <Insert solder oven photo here>
 
 ## Software
+I used PlatformIO in VSCode as my IDE to program the microcontrollers. This works well and makes it easy to import the Arduino framework and FastLED library for quick access to easy-to-use functions and tools.
+
+The bulk of the code came from another project I made where I had LED name plates that were edge-lit with RGB LEDs. I just added a few additional effects. [main.cpp](src/main.cpp) is available in the [src](src/) folder.
 
 
 # Building your own effects
