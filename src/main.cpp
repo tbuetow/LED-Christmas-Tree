@@ -21,27 +21,24 @@ constexpr uint8_t CLK_PIN = PIN_PB5;           // Physical PB5
 constexpr uint8_t TICK_OUT_BIT = PIN0_bp;      // Physical PC0, accessed through VPORTC
 constexpr uint8_t BRIGHTNESS_BUTTON_BIT = PIN0_bp; // Physical PB0
 constexpr uint8_t MODE_BUTTON_BIT = PIN2_bp;        // Physical PA2
-constexpr uint8_t NUM_LEDS = 6;
+constexpr uint8_t NUM_LEDS = 10;
+constexpr fl::EOrder LED_COLOR_ORDER = BGR;
 constexpr uint8_t EEPROM_ADDR_BRIGHTNESS = 0x01;
 constexpr uint8_t EEPROM_ADDR_MODE = 0x02;
 
 
 // BRIGHTNESS and MODES
-#define BRIGHTNESS_STEPS 4 //Number of steps to divide min 50 and max 255 into.
+constexpr uint8_t BRIGHTNESS_STEPS = 4; //Number of steps to divide min 50 and max 255 into.
 
 // To add another mode, add it to this enum and then add the matching case block in the switch statement in the while loop.
 enum Mode : uint8_t {
   RAINBOW_SOLID_SLOW,
   RAINBOW_SOLID_FAST,
-  RAINBOW_WAVE_SLOW,
   RAINBOW_WAVE_FAST,
-  COLOR_WHITE_FADE,
   COLOR_WHITE_PARADE,
   SOLID_COLOR,
   SOLID_WHITE,
-  STATIC_COLOR_WHITE_FADE,
   SPARK_FLAME_WHITE,
-  SPARK_FLAME_COLOR,
   MODE_COUNT
 };
 
@@ -169,34 +166,6 @@ void setupFlame() {
   }
 }
 
-void updateSparkFlameColor() {
-  for (uint8_t i = 0; i < NUM_LEDS; i++) {
-    // advance waveform
-    phase[i] += speed[i];
-    uint8_t wave = quadwave8(phase[i]);  // smooth 0..255 triangle-like wave
-
-    // occasionally trigger a bright spark
-    if (random8() < 7) {  // ~3% chance each tick
-      sparkLevel[i] = 255; // full white flash
-    } else {
-      // decay spark over time
-      sparkLevel[i] = qsub8(sparkLevel[i], 10); // subtract with floor at 0
-    }
-
-    // blend between base color and white using sparkLevel and wave
-    uint8_t flicker = scale8(wave, 180); // modulate overall intensity
-    CRGB base = CHSV(COLOR_HUE, 255, 255);
-    CRGB sparkColor = CHSV(SPARK_HUE, 255, 255);
-
-    // base color hue
-    leds[i] = base;
-
-    // overlay white spark burst
-    if (sparkLevel[i] > 0) {
-      leds[i] = blend(base, sparkColor, sparkLevel[i]);
-    }
-  }
-}
 
 void updateSparkFlameSaturation() {
   for (uint8_t i = 0; i < NUM_LEDS; i++) {
@@ -235,7 +204,7 @@ void setup () {
   load_settings_from_eeprom();
 
   delay(200);
-  FastLED.addLeds<APA102HD, DATA_PIN, CLK_PIN, BGR>(leds, NUM_LEDS);
+  FastLED.addLeds<APA102HD, DATA_PIN, CLK_PIN, LED_COLOR_ORDER>(leds, NUM_LEDS);
 }
 
 void loop() {
@@ -261,17 +230,6 @@ void loop() {
         update_time = now;
         for(uint8_t i = 0; i < NUM_LEDS; i++) {
           leds[i] = CHSV(hue_val, 255, 255);
-        }
-        hue_val++;
-      }
-      break;
-
-    case RAINBOW_WAVE_SLOW: //Slowly fade all leds through the rainbow. The rainbow also fades one complete hue cycle across the LEDs
-      step_time = (uint8_t)((uint16_t)CYCLE_TIME_SECONDS_SLOW * 4 / 10);
-      if (now - update_time >= step_time) {
-        update_time = now;
-        for(uint8_t i = 0; i < NUM_LEDS; i++) {
-          leds[i] = CHSV(hue_val - i*255/(NUM_LEDS)/2, 255, 255);
         }
         hue_val++;
       }
@@ -304,17 +262,6 @@ void loop() {
       }
       break;
 
-    case COLOR_WHITE_FADE: //LEDs all together fading between color and white
-      step_time = (uint8_t)((uint16_t)CYCLE_TIME_SECONDS_FAST * 4 / 10); //4/10 is a close approximation of 1000ms/s / 256 step/cycle / 10ms tick. 16 bit math to avoid overflows
-      if (now - update_time >= step_time) {
-        update_time = now;
-        for(uint8_t i = 0; i < NUM_LEDS; i++) {
-          leds[i] = CHSV(COLOR_HUE, cubicwave8(sat_val), dim_white_to_color(sat_val));
-        }
-        sat_val++;
-      }
-      break;
-
     case SOLID_COLOR: //LEDs are static color
       for(uint8_t i = 0; i < NUM_LEDS; i++) {
           leds[i] = CHSV(COLOR_HUE,255,255); //HSV Value here, and everywhere, further controlled by global brightness. Leave at 255!
@@ -327,12 +274,6 @@ void loop() {
       }
       break;
 
-    case STATIC_COLOR_WHITE_FADE: //static white on one end and color on the other
-      for(uint8_t i = 0; i < NUM_LEDS; i++) {
-          uint8_t fade = cubicwave8((255/(NUM_LEDS-1)/2)*i);
-          leds[NUM_LEDS-1-i] = CHSV(COLOR_HUE, fade, dim_white_to_color(fade));
-      }
-      break;
 
     case SPARK_FLAME_WHITE: //CHAT-GPT assisted spark/pop flame effects
       if (now - update_time >= 10) {
@@ -341,14 +282,7 @@ void loop() {
       }
       break;
 
-    case SPARK_FLAME_COLOR: //CHAT-GPT assisted spark/pop flame effects
-      if (now - update_time >= 10) {
-        update_time = now;
-        updateSparkFlameColor();
-      }
-      break;
-
-    default:
+  default:
       break;
     }
     FastLED.setBrightness(get_brightness_from_index());
