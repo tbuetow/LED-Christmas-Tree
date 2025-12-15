@@ -1,31 +1,29 @@
 /*
-  main.c Slowly fades an RGB LED around a hue wheel, using Timer0 and Timer1
+  main.c RGB LED Effects for addressable LEDs. Allows for changing of effects and brightness with buttons.
 */
-#include <FastLED.h> //Reqires C++! Everything else is standard C.
-#include <avr/io.h>
-#include <avr/interrupt.h>
+#include <FastLED.h>
+#include <Arduino.h>
 #include <stdint.h>
 #include <EEPROM.h>
 #include <button.h>
 
 
 // PATTERN CONTROL
-#define CYCLE_TIME_SECONDS_SLOW 300 //Max of 638 seconds! 
-#define CYCLE_TIME_SECONDS_FAST 10 //Min of 3 - min step time is 10ms (timer) = 2.56sec/cycle
-#define COLOR_HUE 80 // Green for minecraft pumpkins
-// #define COLOR_HUE 23 // Lakeview Orange - scaled to 0..255 instead of 0..360deg
-// #define COLOR_HUE 202 // Purple - scaled to 0..255 instead of 0..360deg
-#define SPARK_HUE 190
+constexpr uint16_t CYCLE_TIME_SECONDS_SLOW = 300; //Max of 638 seconds! 
+constexpr uint8_t CYCLE_TIME_SECONDS_FAST = 10; //Min of 3 - min step time is 10ms (timer) = 2.56sec/cycle
+constexpr uint8_t COLOR_HUE = 80; // Green for minecraft pumpkins - scaled to 0..255 instead of 0..360deg
+constexpr uint8_t SPARK_HUE = 190;
+
 
 // HARDWARE CONFIG
-#define CLK 2 //chip pin 8
-#define DATA 0 //chip pin 5
-#define TICK_OUT 1 //chip pin 6
-#define BRIGHTNESS_BUTTON 3 //chip pin 2
-#define MODE_BUTTON 4 //chip pin 3
-#define NUM_LEDS 6
-#define EEPROM_ADDR_BRIGHTNESS 0x01
-#define EEPROM_ADDR_MODE 0x02
+constexpr uint8_t DATA_PIN = PIN_PB4;          // Physical PB4
+constexpr uint8_t CLK_PIN = PIN_PB5;           // Physical PB5
+constexpr uint8_t TICK_OUT_BIT = PIN0_bp;      // Physical PC0, accessed through VPORTC
+constexpr uint8_t BRIGHTNESS_BUTTON_BIT = PIN0_bp; // Physical PB0
+constexpr uint8_t MODE_BUTTON_BIT = PIN2_bp;        // Physical PA2
+constexpr uint8_t NUM_LEDS = 6;
+constexpr uint8_t EEPROM_ADDR_BRIGHTNESS = 0x01;
+constexpr uint8_t EEPROM_ADDR_MODE = 0x02;
 
 
 // BRIGHTNESS and MODES
@@ -57,36 +55,42 @@ bool write_eeprom_flag = false;
 
 
 // BUTTONS
-Button btn_brightness(&PINB, BRIGHTNESS_BUTTON);
-Button btn_mode(&PINB, MODE_BUTTON);
+Button btn_brightness(&VPORTB.IN, BRIGHTNESS_BUTTON_BIT);
+Button btn_mode(&VPORTA.IN, MODE_BUTTON_BIT);
 
 
-void enable_timer1() {
+// Match Arduino core's TCA prescaler selection so TCB1 can use CLKTCA as its clock.
+// TCB1_COMPARE needs to be less than 16535.
+constexpr uint32_t TCA_PRESCALER_DIVISOR = 16UL; // 20MHz / 16 = 1.25MHz
+constexpr uint16_t TCB1_COMPARE = static_cast<uint16_t>((F_CPU / TCA_PRESCALER_DIVISOR / 100UL) - 1UL); // 20,000,000 / 16 / 100 = 12,500. -1 because 0 indexed
+
+void enable_tick_timer() {
   cli();
-  GTCCR |= (1 << PSR1); //reset prescaler
-  TCCR1 |= (1 << CTC1); //clear on match
-  TCCR1 &= ~0x0F; // clear all 4 prescaler bits. Something else must be setting them - random internet dude said millis() is on timer1 on ATTiny85...
-  TCCR1 |= (1 << CS13) | (1 << CS11); // 1/512 prescaler
-  OCR1C = 156; //compare match every 8MHz / 512 prescaler / 156 count = 100.1603 compares/sec or 9.984ms (0.16% error) OCR1C resets TCNT1
-  OCR1A = 156; //compare match every 8MHz / 512 prescaler / 156 count = 100.1603 compares/sec or 9.984ms (0.16% error) OCR1C fires COMPA
-  OCR1B = 77; //this will match every 10ms, but 5ms before OCR1A (as the timer is only cleared on C)
-  TIMSK |= (1 << OCIE1A) | (1 << OCIE1B); //Interrupt on match for both comparators
+  TCB1.CTRLA = 0x00;
+  TCB1.CTRLB = TCB_CNTMODE_INT_gc; // Periodic interrupt mode
+  TCB1.CCMP = TCB1_COMPARE;
+  TCB1.INTFLAGS = TCB_CAPT_bm;
+  TCB1.INTCTRL = TCB_CAPT_bm;
+  TCB1.CTRLA = TCB_CLKSEL_CLKTCA_gc | TCB_ENABLE_bm; // Clocked from TCA (prescaled) to keep count in range
   sei();
 }
 
 void set_cpu_speed() { 
-  // See datasheet 6.5.2 - CLKPR
-  cli();
-  CLKPR = (1<<CLKPCE);
-  CLKPR = 0x00; 
-  sei();
+  // Ensure the main clock runs without a prescaler for consistent timing.
+  _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, 0x00);
 }
 
 void set_io_pins() {
-  DDRB &= ~((1 << BRIGHTNESS_BUTTON) | (1 << MODE_BUTTON)); //Button pins are inputs
-  PORTB |= (1 << BRIGHTNESS_BUTTON) | (1 << MODE_BUTTON); //Pull ups active
+  // Button pins as inputs with pull-ups
+  VPORTA.DIR &= ~(1 << MODE_BUTTON_BIT);
+  VPORTB.DIR &= ~(1 << BRIGHTNESS_BUTTON_BIT);
+  PORTA.PIN2CTRL = PORT_PULLUPEN_bm | PORT_ISC_INTDISABLE_gc;
+  PORTB.PIN0CTRL = PORT_PULLUPEN_bm | PORT_ISC_INTDISABLE_gc;
 
-  DDRB |= (1 << TICK_OUT) | (1 << DATA) | (1 << CLK); //Tick and spi are outputs
+  // Outputs: tick and APA102 signals
+  VPORTB.DIR |= PIN4_bm | PIN5_bm;
+  VPORTC.DIR |= (1 << TICK_OUT_BIT);
+  VPORTC.OUT &= ~(1 << TICK_OUT_BIT);
 }
 
 void load_settings_from_eeprom() {
@@ -131,13 +135,9 @@ uint8_t dim_white_to_color(uint8_t color_sat_val) {
   return 175 + scale8(cubicwave8(color_sat_val),80);
 }
 
-ISR(TIMER1_COMPA_vect) {
+ISR(TCB1_INT_vect) {
   //This is a ~10ms timer
   ten_millis++;
-  // PORTB ^= (1 << TICK_OUT); //toggle the TICK_OUT pin for hardware debugging purposes
-}
-
-ISR(TIMER1_COMPB_vect) {
   //Button debouncing updates
   btn_brightness.update();
   btn_mode.update();
@@ -229,13 +229,13 @@ void updateSparkFlameSaturation() {
 
 void setup () {
   set_cpu_speed();
-  enable_timer1();
+  enable_tick_timer();
   set_io_pins();
   delay(100);
   load_settings_from_eeprom();
 
   delay(200);
-  FastLED.addLeds<APA102HD, DATA, CLK, BGR>(leds, NUM_LEDS);
+  FastLED.addLeds<APA102HD, DATA_PIN, CLK_PIN, BGR>(leds, NUM_LEDS);
 }
 
 void loop() {
@@ -352,11 +352,11 @@ void loop() {
       break;
     }
     FastLED.setBrightness(get_brightness_from_index());
-    PORTB |= (1 << TICK_OUT); //rising edge on start of LED write out
+    VPORTC.OUT |= (1 << TICK_OUT_BIT); //rising edge on start of LED write out
     FastLED.show();  // Update LEDs. Want to run this as often as possible.
-    PORTB &= ~(1 << TICK_OUT); // pulse width = led write time, period = loop time
+    VPORTC.OUT &= ~(1 << TICK_OUT_BIT); // pulse width = led write time, period = loop time
     write_settings_to_eeprom_conditional();
 
-    // PORTB ^= (1 << TICK_OUT); //toggle the TICK_OUT pin for hardware debugging purposes
+    // VPORTC.OUT ^= (1 << TICK_OUT); //toggle the TICK_OUT pin for hardware debugging purposes
   }
 }
