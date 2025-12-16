@@ -43,6 +43,7 @@ void init_timer() {
 ISR(TCB1_INT_vect) {
   //This is a ~10ms timer
   tick_10ms++;
+  TCB1.INTFLAGS = TCB_CAPT_bm; // clear interrupt flag
   //Button debouncing updates
   service_buttons();
 }
