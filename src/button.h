@@ -9,7 +9,7 @@ class Button {
 public:
   Button(volatile uint8_t* pinReg, uint8_t pin);
 
-  void update();  // call this every 10ms from a timer ISR
+  void update();  // call this roughly every 10ms for debouncing
   bool wasPressed();   // returns true once when pressed
   bool wasReleased();  // returns true once when released
 
