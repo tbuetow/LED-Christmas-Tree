@@ -7,7 +7,7 @@ namespace Config {
 // PATTERN CONTROL
 constexpr uint16_t CYCLE_TIME_SECONDS_SLOW = 300; //Max of 638 seconds! 
 constexpr uint8_t CYCLE_TIME_SECONDS_FAST = 10; //Min of 3 - min step time is 10ms (timer) = 2.56sec/cycle
-constexpr uint8_t COLOR_HUE = 80; // Green for minecraft pumpkins - scaled to 0..255 instead of 0..360deg
+constexpr uint8_t COLOR_HUE = 0; // Green for minecraft pumpkins - scaled to 0..255 instead of 0..360deg
 constexpr uint8_t SPARK_HUE = 190;
 
 

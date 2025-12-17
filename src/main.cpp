@@ -6,7 +6,6 @@
 #include <stdint.h>
 #include <EEPROM.h>
 #include "button.h"
-#include "input.h"
 #include "config.h"
 #include "hardware.h"
 #include "state.h"
@@ -14,14 +13,19 @@
 
 CRGB leds[Config::NUM_LEDS];
 
+constexpr uint16_t RAINBOW_STEPS = 256;
+constexpr uint32_t RAINBOW_SLOW_STEP_MS = (Config::CYCLE_TIME_SECONDS_SLOW * 1000UL) / RAINBOW_STEPS;
+constexpr uint32_t RAINBOW_FAST_STEP_MS = (Config::CYCLE_TIME_SECONDS_FAST * 1000UL) / RAINBOW_STEPS;
+constexpr uint8_t BUTTON_SAMPLE_MS = 10;
+constexpr uint8_t PARADE_STEP_MS = 16;
+constexpr uint8_t SPARK_STEP_MS = 10;
+
 uint8_t phase[Config::NUM_LEDS];
 uint8_t speed[Config::NUM_LEDS];
 uint8_t sparkLevel[Config::NUM_LEDS]; // 0..255 intensity of white pop
 
 uint8_t hue_val = 0;
-uint8_t sat_val = 0;
-uint8_t step_time = 0;
-unsigned long update_time = 0;
+uint8_t parade_phase = 0;
 
 
 uint8_t dim_white_to_color(uint8_t color_sat_val) {
@@ -70,12 +74,11 @@ void updateSparkFlameSaturation() {
 
 void setup () {
   init_CPU();
-  init_timer();
   init_gpio();
-  delay(100);
+  delay(50);
   load_state();
 
-  delay(200);
+  delay(100);
   FastLED.addLeds<APA102, Config::DATA_PIN, Config::CLK_PIN, Config::LED_COLOR_ORDER>(leds, Config::NUM_LEDS);
   FastLED.setCorrection(TypicalSMD5050);
   FastLED.setTemperature(UncorrectedTemperature);
@@ -84,35 +87,24 @@ void setup () {
 void loop() {
   
   while(1) {
-    unsigned long now = tick_10ms;
+    EVERY_N_MILLIS_I(buttonPollTimer, BUTTON_SAMPLE_MS) { service_buttons(); }
+
     switch (current_mode())
     {
     case Mode::RAINBOW_SOLID_SLOW: //Slowly fade all leds toghether around the rainbow
-      step_time = (uint8_t)((uint16_t)Config::CYCLE_TIME_SECONDS_SLOW * 4 / 10); //4/10 is a close approximation of 1000ms/s / 256 step/cycle / 10ms tick. 16 bit math to avoid overflows
-      if (now - update_time >= step_time) {
-        update_time = now;
-        for(uint8_t i = 0; i < Config::NUM_LEDS; i++) {
-          leds[i] = CHSV(hue_val, 255, 255);
-        }
-        hue_val++;
+      EVERY_N_MILLIS_I(rainbowSolidSlowTimer, RAINBOW_SLOW_STEP_MS) {
+        fill_solid(leds, Config::NUM_LEDS, CHSV(hue_val++, 255, 255));
       }
       break;
 
     case Mode::RAINBOW_SOLID_FAST: //Quickly fade all leds toghether around the rainbow
-      step_time = (uint8_t)((uint16_t)Config::CYCLE_TIME_SECONDS_FAST * 4 / 10);
-      if (now - update_time >= step_time) {
-        update_time = now;
-        for(uint8_t i = 0; i < Config::NUM_LEDS; i++) {
-          leds[i] = CHSV(hue_val, 255, 255);
-        }
-        hue_val++;
+      EVERY_N_MILLIS_I(rainbowSolidFastTimer, RAINBOW_FAST_STEP_MS) {
+        fill_solid(leds, Config::NUM_LEDS, CHSV(hue_val++, 255, 255));
       }
       break;
 
     case Mode::RAINBOW_WAVE_FAST: //Quickly fade all leds through the rainbow. The rainbow also fades one complete hue cycle across the LEDs
-      step_time = (uint8_t)((uint16_t)Config::CYCLE_TIME_SECONDS_FAST * 4 / 10);
-      if (now - update_time >= step_time) {
-        update_time = now;
+      EVERY_N_MILLIS_I(rainbowWaveFastTimer, RAINBOW_FAST_STEP_MS) {
         for(uint8_t i = 0; i < Config::NUM_LEDS; i++) {
           leds[i] = CHSV(hue_val - i*255/(Config::NUM_LEDS), 255, 255);
         }
@@ -121,8 +113,11 @@ void loop() {
       break;
 
     case Mode::COLOR_WHITE_PARADE: //LEDs fading from color to white and back, every other LED 180 degrees out of phase
+      EVERY_N_MILLIS_I(colorWhiteParadeTimer, PARADE_STEP_MS) {
+        parade_phase = (parade_phase + 1) % 255;
+      }
       for (uint8_t i = 0; i < Config::NUM_LEDS; i++) {
-        uint8_t t = (millis() / 16) % 255; // controls speed
+        uint8_t t = parade_phase; // controls speed
 
         const uint8_t width = 4;
         uint8_t pos_color = (i * (256 / width)) - t; //order of ops matters for overflow - saves on using 16 bit math.
@@ -150,10 +145,7 @@ void loop() {
 
 
     case Mode::SPARK_FLAME_WHITE: //CHAT-GPT assisted spark/pop flame effects
-      if (now - update_time >= 10) {
-        update_time = now;
-        updateSparkFlameSaturation();
-      }
+      EVERY_N_MILLIS_I(sparkFlameTimer, SPARK_STEP_MS) { updateSparkFlameSaturation(); }
       break;
 
   default:
