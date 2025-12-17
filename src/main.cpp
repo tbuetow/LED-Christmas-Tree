@@ -76,7 +76,9 @@ void setup () {
   load_state();
 
   delay(200);
-  FastLED.addLeds<APA102HD, Config::DATA_PIN, Config::CLK_PIN, Config::LED_COLOR_ORDER>(leds, Config::NUM_LEDS);
+  FastLED.addLeds<APA102, Config::DATA_PIN, Config::CLK_PIN, Config::LED_COLOR_ORDER>(leds, Config::NUM_LEDS);
+  FastLED.setCorrection(TypicalSMD5050);
+  FastLED.setTemperature(UncorrectedTemperature);
 }
 
 void loop() {
