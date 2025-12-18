@@ -7,8 +7,8 @@ namespace Config {
 // PATTERN CONTROL
 constexpr uint16_t CYCLE_TIME_SECONDS_SLOW = 300; //Max of 638 seconds! 
 constexpr uint8_t CYCLE_TIME_SECONDS_FAST = 10; //Min of 3 - min step time is 10ms (timer) = 2.56sec/cycle
-constexpr uint8_t COLOR_HUE = 0; // Green for minecraft pumpkins - scaled to 0..255 instead of 0..360deg
-constexpr uint8_t SPARK_HUE = 190;
+constexpr uint8_t GREEN_HUE = 97; // Green - scaled to 0..255 instead of 0..360deg
+constexpr uint8_t RED_HUE = 0; // Red - scaled to 0..255 instead of 0..360deg
 
 
 // HARDWARE CONFIG
@@ -18,7 +18,7 @@ constexpr uint8_t TICK_OUT_BIT = PIN0_bp;      // Physical PC0, accessed through
 constexpr uint8_t BRIGHTNESS_BUTTON_BIT = PIN0_bp; // Physical PB0
 constexpr uint8_t MODE_BUTTON_BIT = PIN2_bp;        // Physical PA2
 constexpr uint8_t NUM_LEDS = 10;
-constexpr fl::EOrder LED_COLOR_ORDER = BGR;
+constexpr fl::EOrder LED_COLOR_ORDER = RBG; //RBG usually for adafruit, BGR usually for Aliexpress vendor COCurve 
 constexpr uint8_t EEPROM_ADDR_BRIGHTNESS = 0x01;
 constexpr uint8_t EEPROM_ADDR_MODE = 0x02;
 

@@ -50,7 +50,7 @@ void updateSparkFlameSaturation() {
     uint8_t wave = quadwave8(phase[i]);  // smooth 0..255 triangle-like wave
 
     // occasionally trigger a bright spark
-    if (random8() < 3) {  // ~1-2% chance each tick
+    if (random16() < 327) {  // out of 65536 - about 0.5% chance
       sparkLevel[i] = dim_white_to_color(0); // full white flash
     } else {
       // decay spark over time
@@ -63,7 +63,7 @@ void updateSparkFlameSaturation() {
     uint8_t val = 255;
 
     // base color hue
-    leds[i] = CHSV(Config::COLOR_HUE, sat, val);
+    leds[i] = CHSV(Config::GREEN_HUE, sat, val);
 
     // overlay white spark burst
     if (sparkLevel[i] > 0) {
@@ -112,34 +112,47 @@ void loop() {
       }
       break;
 
-    case Mode::COLOR_WHITE_PARADE: //LEDs fading from color to white and back, every other LED 180 degrees out of phase
+    case Mode::GREEN_WHITE_PARADE: //LEDs fading between colors, marching around the circle
+    case Mode::RED_WHITE_PARADE:
+    case Mode::GREEN_RED_PARADE:
       EVERY_N_MILLIS_I(colorWhiteParadeTimer, PARADE_STEP_MS) {
         parade_phase = (parade_phase + 1) % 255;
       }
       for (uint8_t i = 0; i < Config::NUM_LEDS; i++) {
         uint8_t t = parade_phase; // controls speed
 
-        const uint8_t width = 4;
+        const uint8_t width = 5;
         uint8_t pos_color = (i * (256 / width)) - t; //order of ops matters for overflow - saves on using 16 bit math.
         uint8_t pos_white = (i * (256 / width)) - t - 128;
 
         uint8_t bright_color = cubicwave8(pos_color);
         uint8_t bright_white = cubicwave8(pos_white);
-
-        leds[i] = CHSV(Config::COLOR_HUE, 255, bright_color) + CHSV(Config::COLOR_HUE, 0, scale8(bright_white,175));
+        if (current_mode() == Mode::GREEN_WHITE_PARADE){
+          leds[i] = CHSV(Config::GREEN_HUE, 255, bright_color) + CHSV(Config::GREEN_HUE, 0, scale8(bright_white,175));
+        } else if (current_mode() == Mode::RED_WHITE_PARADE) {
+          leds[i] = CHSV(Config::RED_HUE, 255, bright_color) + CHSV(Config::RED_HUE, 0, scale8(bright_white,175));
+        } else {
+          leds[i] = CHSV(Config::RED_HUE, 255, bright_color) + CHSV(Config::GREEN_HUE, 255, bright_white);
+        }
 
       }
       break;
 
-    case Mode::SOLID_COLOR: //LEDs are static color
+    case Mode::SOLID_GREEN: //LEDs are static color
       for(uint8_t i = 0; i < Config::NUM_LEDS; i++) {
-          leds[i] = CHSV(Config::COLOR_HUE,255,255); //HSV Value here, and everywhere, further controlled by global brightness. Leave at 255!
+        leds[i] = CHSV(Config::GREEN_HUE,255,255);
+      }
+      break;
+    
+    case Mode::SOLID_RED:
+      for(uint8_t i = 0; i < Config::NUM_LEDS; i++) {
+        leds[i] = CHSV(Config::RED_HUE,255,255);
       }
       break;
 
     case Mode::SOLID_WHITE: //LEDs are white
       for(uint8_t i = 0; i < Config::NUM_LEDS; i++) {
-          leds[i] = CHSV(Config::COLOR_HUE,0,dim_white_to_color(0));
+          leds[i] = CHSV(Config::GREEN_HUE,0,dim_white_to_color(0));
       }
       break;
 
