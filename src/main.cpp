@@ -181,8 +181,7 @@ void loop() {
       EVERY_N_MILLIS_I(noiseTimer, NOISE_STEP_MS) {
         holidayNoiseZ += Config::NOISE_Z_STEP;
         for (uint8_t i = 0; i < Config::NUM_LEDS; i++) {
-          // Map LEDs evenly across 0-255 to avoid clumping near the center of noise.
-          uint8_t x = (i) * (255 / (Config::NUM_LEDS - 1));
+          uint16_t x = i * Config::NOISE_SAMPLE_DISTANCE;
           uint8_t noiseVal = inoise8(x, holidayNoiseZ);
           leds[i] = holidayNoiseColor(noiseVal);
         }

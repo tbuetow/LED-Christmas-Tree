@@ -20,7 +20,8 @@ constexpr uint8_t TWINKLE_CHANCE = 1; // percent chance every cycle time
 
 //Noise
 constexpr uint8_t BLEND_DISTANCE = 50; // value 0 - 127 from which to stop blending in white and become solid.
-constexpr uint8_t NOISE_Z_STEP = 2; // "time" axis to move perlin noise in 2D map with each step.
+constexpr uint8_t NOISE_SAMPLE_DISTANCE = 40; // "distance" between each LED on the 1-D noise map. Farther distances make each LED more independent.
+constexpr uint8_t NOISE_Z_STEP = 2; // "time" axis to move perlin noise in 2D map with each step. Larger steps make the pattern move faster.
 
 //Solid colors
 constexpr uint8_t GREEN_HUE = 97; // Green - scaled to 0..255 instead of 0..360deg
@@ -33,7 +34,7 @@ constexpr uint8_t CLK_PIN = PIN_PB5;           // Physical PB5
 constexpr uint8_t TICK_OUT_BIT = PIN0_bp;      // Physical PC0, accessed through VPORTC
 constexpr uint8_t BRIGHTNESS_BUTTON_BIT = PIN0_bp; // Physical PB0
 constexpr uint8_t MODE_BUTTON_BIT = PIN2_bp;        // Physical PA2
-constexpr uint8_t NUM_LEDS = 10;
+constexpr uint8_t NUM_LEDS = 10; //Number of LEDS on the board
 constexpr fl::EOrder LED_COLOR_ORDER = BGR; //RBG usually for adafruit, BGR usually for Aliexpress vendor COCurve 
 constexpr uint8_t EEPROM_ADDR_BRIGHTNESS = 0x01;
 constexpr uint8_t EEPROM_ADDR_MODE = 0x02;
