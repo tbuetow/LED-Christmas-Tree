@@ -19,8 +19,8 @@ constexpr uint16_t TWINKLE_REST_TIME_MS = 1500;
 constexpr uint8_t TWINKLE_CHANCE = 1; // percent chance every cycle time
 
 //Noise
-constexpr uint8_t BLEND_DISTANCE = 100; // value 0 - 127 from which to stop blending in white and become solid.
-constexpr uint8_t NOISE_Z_STEP = 4; // "time" axis to move perlin noise in 2D map with each step.
+constexpr uint8_t BLEND_DISTANCE = 50; // value 0 - 127 from which to stop blending in white and become solid.
+constexpr uint8_t NOISE_Z_STEP = 2; // "time" axis to move perlin noise in 2D map with each step.
 
 //Solid colors
 constexpr uint8_t GREEN_HUE = 97; // Green - scaled to 0..255 instead of 0..360deg

@@ -24,8 +24,7 @@ constexpr uint8_t TWINKLE_UP_STEP = TWINKLE_PEAK / (Config::TWINKLE_RISE_TIME_MS
 constexpr uint8_t TWINKLE_DOWN_STEP = TWINKLE_PEAK / (Config::TWINKLE_FALL_TIME_MS / TWINKLE_STEP_MS);
 constexpr uint8_t TWINKLE_REST_STEP = TWINKLE_PEAK / (Config::TWINKLE_REST_TIME_MS / TWINKLE_STEP_MS);
 
-constexpr uint8_t NOISE_STEP_MS = 25;
-
+constexpr uint8_t NOISE_STEP_MS = 16;
 constexpr uint8_t MIDPOINT = 127;
 
 uint8_t twinkleValue[Config::NUM_LEDS];
@@ -45,22 +44,27 @@ uint8_t dim_white_to_color(uint8_t color_sat_val) {
 CRGB holidayNoiseColor(uint8_t noiseVal) {
   const CRGB red = CHSV(Config::RED_HUE, 255, 255);
   const CRGB green = CHSV(Config::GREEN_HUE, 255, 255);
-  const CRGB white = CHSV(0, 0, 255);
+  const CRGB white = CHSV(0, 0, 200);
 
-  if (noiseVal < MIDPOINT-Config::BLEND_DISTANCE) { //87
-    return red;
+  const uint8_t lowerBlendStart = MIDPOINT - Config::BLEND_DISTANCE; // e.g. 27 when BLEND_DISTANCE=100
+  const uint8_t upperBlendEnd   = MIDPOINT + Config::BLEND_DISTANCE; // clamp handled by uint8 wrap avoidance
+
+  if (noiseVal <= lowerBlendStart) {
+    return red; // 0..lowerBlendStart
   }
   if (noiseVal <= MIDPOINT) {
-    // MIDPOINT TO BLEND_DISTANCE below: blend red -> white
-    uint8_t mix = (uint16_t)(noiseVal - Config::BLEND_DISTANCE) * 255 / (127-Config::BLEND_DISTANCE);
+    // lowerBlendStart..MIDPOINT: red -> white
+    uint8_t range = MIDPOINT - lowerBlendStart;
+    uint8_t mix = ((uint16_t)(noiseVal - lowerBlendStart) * 255) / range;
     return blend(red, white, mix);
   }
-  if (noiseVal <= MIDPOINT+Config::BLEND_DISTANCE) {
-    // MIDPOINT to BLEND_DISTANCE above
-    uint8_t mix = (uint16_t)(noiseVal - MIDPOINT) * 255 / Config::BLEND_DISTANCE;
+  if (noiseVal <= upperBlendEnd) {
+    // MIDPOINT..upperBlendEnd: white -> green
+    uint8_t range = upperBlendEnd - MIDPOINT;
+    uint8_t mix = ((uint16_t)(noiseVal - MIDPOINT) * 255) / range;
     return blend(white, green, mix);
   }
-  return green;
+  return green; // above upperBlendEnd
 }
 
 void updateTwinkles(uint8_t baseHue) {
@@ -157,9 +161,9 @@ void loop() {
         uint8_t bright_color = cubicwave8(pos_color);
         uint8_t bright_white = cubicwave8(pos_white);
         if (current_mode() == Mode::GREEN_WHITE_PARADE){
-          leds[i] = CHSV(Config::GREEN_HUE, 255, bright_color) + CHSV(Config::GREEN_HUE, 0, scale8(bright_white,175));
+          leds[i] = CHSV(Config::GREEN_HUE, 255, bright_color) + CHSV(Config::GREEN_HUE, 0, scale8(bright_white,200));
         } else if (current_mode() == Mode::RED_WHITE_PARADE) {
-          leds[i] = CHSV(Config::RED_HUE, 255, bright_color) + CHSV(Config::RED_HUE, 0, scale8(bright_white,175));
+          leds[i] = CHSV(Config::RED_HUE, 255, bright_color) + CHSV(Config::RED_HUE, 0, scale8(bright_white,200));
         } else {
           leds[i] = CHSV(Config::RED_HUE, 255, bright_color) + CHSV(Config::GREEN_HUE, 255, bright_white);
         }
