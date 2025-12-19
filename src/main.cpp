@@ -189,20 +189,15 @@ void loop() {
       break;
 
     case Mode::SOLID_RED:
-      for(uint8_t i = 0; i < Config::NUM_LEDS; i++) {
-          leds[i] = CHSV(Config::RED_HUE,255,255);
-        }
+      fill_solid(leds,Config::NUM_LEDS,CHSV(Config::RED_HUE,255,255));
       break;
+      
     case Mode::SOLID_GREEN: //LEDs are static color
-      for(uint8_t i = 0; i < Config::NUM_LEDS; i++) {
-        leds[i] = CHSV(Config::GREEN_HUE,255,255);
-      }
+      fill_solid(leds,Config::NUM_LEDS,CHSV(Config::GREEN_HUE,255,255));
       break;
 
     case Mode::SOLID_WHITE: //LEDs are white
-      for(uint8_t i = 0; i < Config::NUM_LEDS; i++) {
-          leds[i] = CHSV(0,0,175);
-      }
+      fill_solid(leds,Config::NUM_LEDS,CHSV(0,0,200));
       break;
 
   default:
