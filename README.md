@@ -1,5 +1,7 @@
 # 🎄RGB LED Christmas Trees!
 
+### Hi! If you are reading this before Christmas, I haven't fully updated it! There will be a lot more pictures and details added over the break!
+
 Each year, I make a small holiday bauble for teachers, family, and friends. Usually my wife and I come up with an idea around Thanksgiving and then panic for three weeks to deliver something by the last day of school for the holidays.
 
 This year we chose to revisit something we made 7 years ago, but improve on it, building on some of my more recent projects with addressable RGB LEDs and better tools like my multiple extruder 3D printer and solder reflow oven.
