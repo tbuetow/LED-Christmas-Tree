@@ -13,9 +13,11 @@ constexpr uint8_t CYCLE_TIME_SECONDS_FAST = 10; //also used for rainbow wave
 constexpr uint8_t PARADE_CYCLE_TIME_SECONDS = 2;
 
 //Twinkles
-constexpr uint16_t TWINKLE_RISE_TIME_MS = 200;
-constexpr uint16_t TWINKLE_FALL_TIME_MS = 1650;
-constexpr uint8_t TWINKLE_CHANCE = 10; // percent chance every cycle time
+constexpr uint16_t TWINKLE_RISE_TIME_MS = 75;
+constexpr uint16_t TWINKLE_FALL_TIME_MS = 1300;
+constexpr uint16_t TWINKLE_REST_TIME_MS = 1500;
+constexpr uint8_t TWINKLE_CHANCE = 1; // percent chance every cycle time
+
 
 //Solid colors
 constexpr uint8_t GREEN_HUE = 97; // Green - scaled to 0..255 instead of 0..360deg

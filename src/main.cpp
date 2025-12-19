@@ -18,18 +18,18 @@ constexpr uint32_t RAINBOW_FAST_STEP_MS = (Config::CYCLE_TIME_SECONDS_FAST * 100
 
 
 constexpr uint8_t PARADE_STEP_MS = (Config::PARADE_CYCLE_TIME_SECONDS * 1000UL) / RAINBOW_STEPS;
-constexpr uint8_t TWINKLE_STEP_MS = 30;
+constexpr uint8_t TWINKLE_STEP_MS = 16;
 constexpr uint8_t TWINKLE_PEAK = 220;
 constexpr uint8_t TWINKLE_UP_STEP = TWINKLE_PEAK / (Config::TWINKLE_RISE_TIME_MS / TWINKLE_STEP_MS);
 constexpr uint8_t TWINKLE_DOWN_STEP = TWINKLE_PEAK / (Config::TWINKLE_FALL_TIME_MS / TWINKLE_STEP_MS);
+constexpr uint8_t TWINKLE_REST_STEP = TWINKLE_PEAK / (Config::TWINKLE_REST_TIME_MS / TWINKLE_STEP_MS);
 constexpr uint8_t NOISE_STEP_MS = 25;
 constexpr uint8_t NOISE_X_SCALE = 32;
 constexpr uint8_t NOISE_Z_STEP = 10;
 
-uint8_t phase[Config::NUM_LEDS];
-uint8_t speed[Config::NUM_LEDS];
 uint8_t twinkleValue[Config::NUM_LEDS];
 bool twinkleRising[Config::NUM_LEDS];
+uint8_t twinkleRest[Config::NUM_LEDS];
 
 uint8_t hue_val = 0;
 uint8_t parade_phase = 0;
@@ -55,8 +55,9 @@ CRGB holidayNoiseColor(uint8_t noiseVal) {
 void updateTwinkles(uint8_t baseHue) {
   for (uint8_t i = 0; i < Config::NUM_LEDS; i++) {
     // Decide if a new twinkle should start
-    if (!twinkleRising[i] && twinkleValue[i] == 0 && random8(100) < Config::TWINKLE_CHANCE) {
+    if (!twinkleRising[i] && twinkleValue[i] == 0 && twinkleRest[i] == 0 && random8(100) < Config::TWINKLE_CHANCE) {
       twinkleRising[i] = true;
+      twinkleRest[i] = TWINKLE_PEAK;
     }
 
     if (twinkleRising[i]) {
@@ -67,6 +68,8 @@ void updateTwinkles(uint8_t baseHue) {
       }
     } else if (twinkleValue[i] > 0) {
       twinkleValue[i] = qsub8(twinkleValue[i], TWINKLE_DOWN_STEP);
+    } else {
+      twinkleRest[i] = qsub8(twinkleRest[i],TWINKLE_REST_STEP);
     }
 
     CRGB base = CHSV(baseHue, 255, 200);
