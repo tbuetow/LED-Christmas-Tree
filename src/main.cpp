@@ -23,9 +23,10 @@ constexpr uint8_t TWINKLE_PEAK = 220;
 constexpr uint8_t TWINKLE_UP_STEP = TWINKLE_PEAK / (Config::TWINKLE_RISE_TIME_MS / TWINKLE_STEP_MS);
 constexpr uint8_t TWINKLE_DOWN_STEP = TWINKLE_PEAK / (Config::TWINKLE_FALL_TIME_MS / TWINKLE_STEP_MS);
 constexpr uint8_t TWINKLE_REST_STEP = TWINKLE_PEAK / (Config::TWINKLE_REST_TIME_MS / TWINKLE_STEP_MS);
+
 constexpr uint8_t NOISE_STEP_MS = 25;
-constexpr uint8_t NOISE_X_SCALE = 32;
-constexpr uint8_t NOISE_Z_STEP = 10;
+
+constexpr uint8_t MIDPOINT = 127;
 
 uint8_t twinkleValue[Config::NUM_LEDS];
 bool twinkleRising[Config::NUM_LEDS];
@@ -46,10 +47,20 @@ CRGB holidayNoiseColor(uint8_t noiseVal) {
   const CRGB green = CHSV(Config::GREEN_HUE, 255, 255);
   const CRGB white = CHSV(0, 0, 255);
 
-  if (noiseVal < 128) {
-    return blend(red, white, noiseVal * 2);
+  if (noiseVal < MIDPOINT-Config::BLEND_DISTANCE) { //87
+    return red;
   }
-  return blend(white, green, (noiseVal - 128) * 2);
+  if (noiseVal <= MIDPOINT) {
+    // MIDPOINT TO BLEND_DISTANCE below: blend red -> white
+    uint8_t mix = (uint16_t)(noiseVal - Config::BLEND_DISTANCE) * 255 / (127-Config::BLEND_DISTANCE);
+    return blend(red, white, mix);
+  }
+  if (noiseVal <= MIDPOINT+Config::BLEND_DISTANCE) {
+    // MIDPOINT to BLEND_DISTANCE above
+    uint8_t mix = (uint16_t)(noiseVal - MIDPOINT) * 255 / Config::BLEND_DISTANCE;
+    return blend(white, green, mix);
+  }
+  return green;
 }
 
 void updateTwinkles(uint8_t baseHue) {
@@ -99,6 +110,7 @@ void loop() {
       for (uint8_t i = 0; i < Config::NUM_LEDS; i++) {
         twinkleValue[i] = 0;
         twinkleRising[i] = false;
+        twinkleRest[i] = 0;
       }
       fill_solid(leds, Config::NUM_LEDS, CRGB::Black);
       prevMode = mode;
@@ -163,9 +175,10 @@ void loop() {
 
     case Mode::HOLIDAY_NOISE:
       EVERY_N_MILLIS_I(noiseTimer, NOISE_STEP_MS) {
-        holidayNoiseZ += NOISE_Z_STEP;
+        holidayNoiseZ += Config::NOISE_Z_STEP;
         for (uint8_t i = 0; i < Config::NUM_LEDS; i++) {
-          uint16_t x = static_cast<uint16_t>(i) * NOISE_X_SCALE;
+          // Map LEDs evenly across 0-255 to avoid clumping near the center of noise.
+          uint8_t x = (i) * (255 / (Config::NUM_LEDS - 1));
           uint8_t noiseVal = inoise8(x, holidayNoiseZ);
           leds[i] = holidayNoiseColor(noiseVal);
         }
