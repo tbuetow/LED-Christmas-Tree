@@ -1,6 +1,18 @@
-# 🎄RGB LED Christmas Trees!
+# 🎄RGB LED Christmas Trees! <!-- omit in toc -->
 
-### Hi! If you are reading this before Christmas, I haven't fully updated it! There will be a lot more pictures and details added over the break!
+- [How We Made These](#how-we-made-these)
+  - [3D Printed Parts](#3d-printed-parts)
+    - [Base](#base)
+    - [Trees](#trees)
+    - [PCB Fixture](#pcb-fixture)
+  - [Circuit Boards](#circuit-boards)
+  - [Software](#software)
+  - [Putting it all together](#putting-it-all-together)
+- [Building your own effects](#building-your-own-effects)
+  - [Prerequisites](#prerequisites)
+  - [VSCode / PlatformIO](#vscode--platformio)
+  - [Writing effects](#writing-effects)
+  
 
 Each year, I make a small holiday bauble for teachers, family, and friends. Usually my wife and I come up with an idea around Thanksgiving and then panic for three weeks to deliver something by the last day of school for the holidays.
 
@@ -15,6 +27,7 @@ The concept is a clear thin 3D printed tree on top of a 3D printed base that pow
 - Under $10 and very easy to manufacture, since we want to make 30-40 of these.
 - Document the process to share with others and allow those who are inclined to write their one color effects.
 
+# How We Made These
 ## 3D Printed Parts
 ### Base
 I designed the base and all other fixtures and accessories, except for the trees in Autodesk Fusion.
@@ -24,6 +37,7 @@ I designed the base and all other fixtures and accessories, except for the trees
 You can download it from my [Fusion account](https://a360.co/4iSF2QG) if you want to make modifications yourself. Fusion is free for personal use, get it [here](https://www.autodesk.com/products/fusion-360/overview).
 
 The most likely thing you will want to modify is the embedded text. Just edit the text sketch on the Base component.
+
 ![Fusion Browser Tree View, highlighting a sketch called text](/images/fusion-base-browser-text.png)
 
 Printing was done on my Prusa XL and Core One.
@@ -34,7 +48,7 @@ I started by testing color combinations:
 
 Once done, I was able to begin producing them multiples at a time:
 
-![Tree base printing in progress](images/IMG_0077.jpg)
+![Tree base printing in progress](images/IMG_0077.jpeg)
 
 
 The light dividers and trees were printed on the Core One. Lots of time starting the next print!
@@ -46,25 +60,58 @@ I used tree designs that would print well in vase mode since I wanted them to be
 
 ![Clear tree printing in vase mode](images/IMG_0078.jpg)
 
+Eventually the trees multiplied. Storing things became a challenge!
+
+![Lots of printed trees](images/PXL_20251219_044540324.jpg)
+
 ### PCB Fixture
 I designed and printed a fixture to help with soldering as well, available in [Fixtures](/hw/Fixtures/). The fixture was printed in carbon-fiber reinforced PETG, to help the print maintain flatness. Any similar material, maybe even plain PLA, may be fine. The holes on the left are for M4 heat set inserts, used to hold the clamp in place.
 
-<Insert Fixture Picture here>
+<!-- Insert Fixture Picture here -->
 
 ## Circuit Boards
 The circuit boards were designed in KiCAD. Thanks to the power of modern microprocessors and addressable LEDs, the circuit is quite simple.
 ![KiCad Electrical Schematic](images/KiCad-control-schematic.png)
 ![KiCad Electrical Layout](images/KiCad-control-layout.png)
 
-The control board is **very** small, just 37mm (under 1.5") across. This is in part because I can get the new(er) Microchip ATTiny1616 in a QFN packaged. These are ordered as bare PCBs and I use solder paste and stencils to set components and then reflow them in my solder oven. I would not recommend hand soldering these unless you are very skilled. It would be better to switch to slightly larger components and change the microprocessor out for one in a SOIC package or similar.
+The control board is **very** small, just 37mm (under 1.5") across. This is in part because I can get the new(er) Microchip ATTiny1616 in a VQFN packaged. These are ordered as bare PCBs and I use solder paste and stencils to set components and then reflow them in my solder oven. Hand soldering these would not be possible! The microprocessor has a 0.4mm (1/64") pitch, which is realy tiny! It would be better to switch to slightly larger components and change the microprocessor out for one in a SOIC package or similar if you don't have a reflow oven.
 
-<Insert solder oven photo here>
+However, I do have one!
+
+You start by spreading solder paste over a thin steel stencil onto the PCB.
+![Applying solder paste to a stencil on a fixture](images/PXL_20251217_030022785.jpg)
+
+Then components are carefully placed onto the board, sitting on the solder paste.
+![Looking through a magnifier while placing components on a PCB.](images/PXL_20251217_031108472.jpg)
+
+Then they are backed in my reflow oven, converted from a cheap toaster oven. 30 seconds at 473F should do nicely!
+![Circuit boards fresh from the reflow oven](images/IMG_0112.jpeg)
+
+Once done, the fixture was used again to do the hand soldering part to add the header pins to connect the two boards together.
+![Hand soldering parts onto a PCB](/images/PXL_20251220_032909175.jpg)
 
 ## Software
 I used PlatformIO in VSCode as my IDE to program the microcontrollers. This works well and makes it easy to import the Arduino framework and FastLED library for quick access to easy-to-use functions and tools.
 
-The bulk of the code came from another project I made where I had LED name plates that were edge-lit with RGB LEDs. I just added a few additional effects. [main.cpp](src/main.cpp) is available in the [src](src/) folder.
+The bulk of the code came from another project I made where I had LED name plates that were edge-lit with RGB LEDs. I just added a few additional effects. [main.cpp](src/main.cpp) is where the effect implementations live and is available in the [src](src/) folder. Also there is [config.h](src/config.h) that contains all the "user" changeable parameters that I broke out. This made it easy to tune the effects to get them to look the way I wanted.
 
+One of the new techniques I made is called Holiday Noise. It uses Perlin Noise to shift between red, green, and white colors. You can learn more about the 2D Perlin Noise in FastLED (one of the dimensions is time!) the same way I did by watching [this YouTube video by Scott Marley](https://youtu.be/7Dhh0IMSI4Q?t=266).
+
+## Putting it all together
+The base is designed to print with only minimal support (see the 3mf core one or XL files in [Base Hardware](/hw/Base/)).
+
+Step 1 was to  place the buttons and the control board in the bottom. The base was designed to allow it to slide into position, locking the buttons in place. M2.5 screws were used to hold the PCB in place.
+![Installing buttons and control board into base](/images/IMG_0105.jpeg)
+
+Then the LCD ring simply installed on the top with two more screws. The header pins lined up precicely to provide the electrical connections between the two boards.
+![Screwing LED PCB onto base](/images/IMG_0108.jpeg)
+
+Finished!
+![Large collection of completed trees](/images/IMG_0123.jpeg)
+
+![Top down tree with rainbow effect](/images/IMG_0120.jpeg)
+
+![Tree light up with green carousel effect](/images/IMG_0117.jpeg)
 
 # Building your own effects
 ## Prerequisites
@@ -78,6 +125,7 @@ The bulk of the code came from another project I made where I had LED name plate
 
 
 ## VSCode / PlatformIO
+More to come here later!
 <!--
 - Clone instructions in VSCode
 - PlatformIO activation
@@ -86,7 +134,14 @@ The bulk of the code came from another project I made where I had LED name plate
 -->
 
 ## Writing effects
-<!--
-- Explain timing
-- Explain where to add new effects
--->
+To write your own effects, you'll need to touch at least two files, ideally 3.
+
+The effects are implemented in [main.cpp](/src/main.cpp). That is where you will do the bulk of the work. Add a case statement to the switch conditional in the loop() function. 
+
+However, the system won't know your effect exists until you add it to the list of states. Go to the [state.h](/src/state.h) file and add it to the Mode class. This class defines the order the effects rotate through when you push the next button on the base.
+
+If you wish to make tuneable variables, it's best practice to add them in [config.h](/src/config.h) but I won't judge you if you just hard code them all in your implementation code.
+
+My effects make use of the EVERY_N_MILLIS() timer capabilities in FastLED extensively. This avoids a whole bunch of timer checking code since the people who wrote FastLED are way better at this stuff than I am.
+
+Hopefully that's enough to get you started on your own. Don't be afraid to feed main.cpp to a chatbot and ask it to help you add new effects in the right format. It's a great way to experiment at first. Have fun!
