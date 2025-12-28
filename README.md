@@ -34,11 +34,13 @@ I designed the base and all other fixtures and accessories (except for the trees
 
 ![Fusion screenshot](images/Fusion-base-slice.png)
 
-You can download it from my [Fusion account](https://a360.co/4iSF2QG) if you want to make modifications yourself. Fusion is free for personal use; get it [here](https://www.autodesk.com/products/fusion-360/overview).
+You can download the full model from my [Fusion account](https://a360.co/4piaKZ3) if you want to make modifications yourself. Fusion is free for personal use; get it [here](https://www.autodesk.com/products/fusion-360/overview).
 
-The most likely thing you will want to modify is the embedded text. Just edit the text sketch on the Base component.
+The most likely thing you will want to modify is the embedded text. Just edit the text sketch on the Base component. I've removed the bottom row for the shared model. If you want to add one, add a text to the lower curved line. You will then want to edit the emboss and boundary fill operations immediately after the text in order to ensure the new text is properly embossed.
 
 ![Fusion Browser Tree View, highlighting a sketch called text](/images/fusion-base-browser-text.png)
+
+![Fusion timeline, highlighting the text sketch and the emboss and boundary fill operations](/images/emboss-timeline.png)
 
 Printing was done on my Prusa XL and Core One.
 I started by testing color combinations:
@@ -72,6 +74,7 @@ I designed and printed a fixture to help with soldering as well, available in [F
 ## Circuit Boards
 The circuit boards were designed in KiCAD. Thanks to the power of modern microprocessors and addressable LEDs, the circuit is quite simple.
 ![KiCad Electrical Schematic](images/KiCad-control-schematic.png)
+
 ![KiCad Electrical Layout](images/KiCad-control-layout.png)
 
 The control board is **very** small, just 37mm (under 1.5") across. This is in part because I can get the new(er) Microchip ATTiny1616 in a VQFN package. These are ordered as bare PCBs and I use solder paste and stencils to set components and then reflow them in my solder oven. Hand soldering these would not be possible! The microprocessor has a 0.4mm (1/64") pitch, which is really tiny! It would be better to switch to slightly larger components and change the microprocessor out for one in a SOIC package or similar if you don't have a reflow oven.
